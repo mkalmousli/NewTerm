@@ -9,9 +9,9 @@ android {
     defaultConfig {
         applicationId = "com.newterm"
         minSdk = 14
-        targetSdk = 19
-        versionCode = 1
-        versionName = "0.1"
+        targetSdk = 28
+        versionCode = 2
+        versionName = "0.2"
     }
     sourceSets["main"].java.srcDir("src/main/kotlin")
     compileOptions {
