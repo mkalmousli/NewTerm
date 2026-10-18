@@ -3,5 +3,3 @@ build/
 local.properties
 *.iml
 .idea/
-app/src/main/assets/emuroot/*/emuroot
-app/src/main/assets/emuroot/*/ptyhelper

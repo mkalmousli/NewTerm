@@ -17,6 +17,6 @@ Package `com.newterm` (app/src/main/kotlin):
   `Screen`+`ScreenOps` (grid), `Scrollback`; UI: `TermView`, `TermPainter`, `TermInput`, `Keys`.
 - `core/Pty` runs commands on a real pty via `native/ptyhelper.c` (static C helper, no JNI).
 - `util/` `Symlink` (API 14 safe).
-Binaries: `app/fetch-emuroot.gradle.kts` + `app/ptyhelper.gradle.kts` build static musl emuroot/ptyhelper into `assets/emuroot/<abi>/`.
+Binaries: prebuilt static musl `emuroot` + `ptyhelper` are committed in `assets/emuroot/<abi>/`; delete one and `app/*.gradle.kts` rebuild it (needs git, python3, network).
 CI: `.github/workflows/build.yml` builds the APK on push/PR; tag `v*` publishes a GitHub release.
 Tests: `./gradlew testDebugUnitTest` (emulator unit tests).
