@@ -14,6 +14,7 @@ class DistroBackend : Backend {
 
     override fun prepare(ctx: Context, s: Session, log: (String) -> Unit) {
         val d = DistroDao(ctx).get(s.distroId ?: return) ?: return
+        log(EmurootRunner.diagnose(ctx) + "\n")
         DistroInstaller.ensure(ctx, s, d, log)
     }
 
