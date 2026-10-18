@@ -13,7 +13,10 @@ Package `com.newterm` (app/src/main/kotlin):
 - `ui/dsl/` `Views` (vbox/hbox/label/add), `Shapes`, `Widgets` (button/chip/card/input).
 - `ui/` screens: `Main`, `Session`, `Settings`, `Permissions` activities (extend `BaseActivity.build(theme)`),
   `NewSessionDialog`, `StorageDialog`, `TabBar`, `TerminalView`, `InputBar`.
-- `util/` `Ansi` (SGR→spans), `Symlink` (API 14 safe).
-Binaries: `app/fetch-emuroot.gradle.kts` builds static musl emuroot into `assets/emuroot/<abi>/`.
+- `term/` VT/xterm emulator: `Emulator` (state), `Parser` (escapes), `Csi`, `Modes`, `Pen`/`Palette` (colours),
+  `Screen`+`ScreenOps` (grid), `Scrollback`; UI: `TermView`, `TermPainter`, `TermInput`, `Keys`.
+- `core/Pty` runs commands on a real pty via `native/ptyhelper.c` (static C helper, no JNI).
+- `util/` `Symlink` (API 14 safe).
+Binaries: `app/fetch-emuroot.gradle.kts` + `app/ptyhelper.gradle.kts` build static musl emuroot/ptyhelper into `assets/emuroot/<abi>/`.
 CI: `.github/workflows/build.yml` builds the APK on push/PR; tag `v*` publishes a GitHub release.
-Limits: pipe-based terminal (no PTY), so no full-screen TUIs.
+Tests: `./gradlew testDebugUnitTest` (emulator unit tests).

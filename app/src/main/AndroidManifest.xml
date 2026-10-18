@@ -16,7 +16,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.SessionActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".ui.SettingsActivity" />
         <activity android:name=".ui.PermissionsActivity" />
     </application>

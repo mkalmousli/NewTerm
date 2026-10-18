@@ -2,6 +2,7 @@ package com.newterm.ui
 
 import android.view.View
 import com.newterm.core.SessionManager
+import com.newterm.term.TermView
 import com.newterm.db.SessionDao
 import com.newterm.theme.Theme
 import com.newterm.ui.dsl.*
@@ -29,9 +30,9 @@ class SessionActivity : BaseActivity() {
                 { selected = it; onResume() },
                 { selected = tabs.size; SessionManager.addTerminal(this@SessionActivity, session); onResume() },
                 { SessionManager.closeTerminal(this@SessionActivity, term); selected = 0; onResume() }), m = 2)
-            add(TerminalView(this@SessionActivity, t, SettingDao(this@SessionActivity).int("font_size"), term),
-                1f, 2, height = MATCH)
-            add(InputBar(this@SessionActivity, t) { term.send(it) }, m = 2)
+            val tv = TermView(this@SessionActivity, t, SettingDao(this@SessionActivity).int("font_size"), term)
+            add(tv, 1f, 2, height = MATCH)
+            add(ExtraKeys(this@SessionActivity, t, tv), m = 2)
         }
     }
 }

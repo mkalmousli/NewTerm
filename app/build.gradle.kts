@@ -10,8 +10,8 @@ android {
         applicationId = "com.newterm"
         minSdk = 14
         targetSdk = 28
-        versionCode = 3
-        versionName = "0.3"
+        versionCode = 4
+        versionName = "0.4"
     }
     sourceSets["main"].java.srcDir("src/main/kotlin")
     compileOptions {
@@ -22,5 +22,8 @@ android {
     lint { abortOnError = false; checkReleaseBuilds = false }
 }
 
+dependencies { testImplementation("junit:junit:4.13.2") }
+
 apply(from = "check-loc.gradle.kts")
 apply(from = "fetch-emuroot.gradle.kts")
+apply(from = "ptyhelper.gradle.kts")

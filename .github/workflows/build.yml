@@ -20,8 +20,8 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.cache/emuroot
-          key: emuroot-musl-${{ hashFiles('app/fetch-emuroot.gradle.kts') }}
-      - run: ./gradlew assembleDebug --no-daemon
+          key: emuroot-musl-${{ hashFiles('app/*.gradle.kts') }}
+      - run: ./gradlew testDebugUnitTest assembleDebug --no-daemon
       - run: cp app/build/outputs/apk/debug/app-debug.apk NewTerm-${{ github.ref_name }}.apk
       - uses: actions/upload-artifact@v4
         with:

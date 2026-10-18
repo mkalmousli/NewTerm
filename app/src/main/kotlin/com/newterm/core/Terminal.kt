@@ -4,50 +4,47 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.newterm.backend.BackendRegistry
-import java.io.OutputStream
+import com.newterm.term.Emulator
+import java.util.concurrent.atomic.AtomicBoolean
 
-/** A running shell. Output is buffered so UIs can re-attach after rotation. */
+/** A running shell on a pty, rendered by [emu]. Survives activity recreation. */
 class Terminal(val id: Long, val session: Session, private val ctx: Context) {
-    val output = StringBuilder()
+    val emu = Emulator(80, 24) { write(it) }
     var listener: (() -> Unit)? = null
-    private var stdin: OutputStream? = null
-    private var proc: Process? = null
+    private var pty: Pty? = null
+    private var cols = 80
+    private var rows = 24
     private val ui = Handler(Looper.getMainLooper())
+    private val dirty = AtomicBoolean()
 
     fun start() {
         Thread {
             try {
                 val backend = BackendRegistry.of(session)
-                backend.prepare(ctx, session) { append(it) }
-                val pb = ProcessBuilder(backend.command(ctx, session))
-                pb.directory(session.home(ctx)).redirectErrorStream(true)
-                pb.environment().putAll(backend.env(ctx, session))
-                val p = pb.start()
-                proc = p; stdin = p.outputStream
-                val buf = ByteArray(4096)
-                while (true) {
-                    val n = p.inputStream.read(buf)
-                    if (n < 0) break
-                    append(String(buf, 0, n))
-                }
-                append("\n[exited ${p.waitFor()}]\n")
-            } catch (e: Exception) {
-                append("\n[error: ${e.message}]\n")
-            }
+                backend.prepare(ctx, session) { log(it) }
+                pty = Pty(ctx, backend.command(ctx, session), backend.env(ctx, session), session.home(ctx),
+                    cols, rows, { b, n -> emu.feed(b, n); changed() }, { log("\n[process exited $it]\n") })
+                    .also { it.start() }
+            } catch (e: Exception) { log("\n[error: ${e.message}]\n") }
         }.start()
     }
 
-    fun send(text: String) {
-        Thread { try { stdin?.run { write(text.toByteArray()); flush() } } catch (_: Exception) {} }.start()
+    fun write(s: String) { pty?.write(s.toByteArray()) }
+
+    fun resize(c: Int, r: Int) {
+        if (c == cols && r == rows) return
+        cols = c; rows = r
+        emu.resize(c, r); pty?.resize(c, r); changed()
     }
 
-    fun kill() { proc?.destroy() }
+    fun kill() { pty?.kill() }
 
-    private fun append(s: String) {
-        synchronized(output) {
-            output.append(s)
-            if (output.length > 200_000) output.delete(0, output.length - 150_000)
-        }
-        ui.post { listener?.invoke() }
+    private fun log(s: String) {
+        val b = s.replace("\n", "\r\n").toByteArray()
+        emu.feed(b, b.size); changed()
+    }
+
+    private fun changed() {
+        if (dirty.compareAndSet(false, true)) ui.postDelayed({ dirty.set(false); listener?.invoke() }, 16)
     }
 }

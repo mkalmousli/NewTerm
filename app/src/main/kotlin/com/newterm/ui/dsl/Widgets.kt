@@ -22,10 +22,14 @@ fun Context.button(t: Theme, text: String, primary: Boolean = false, onClick: ()
 fun Context.chip(t: Theme, text: String, selected: Boolean, onClick: () -> Unit) =
     TextView(this).apply {
         this.text = text; textSize = 13f; setPadding(dp(14), dp(8), dp(14), dp(8))
-        setTextColor(if (selected) t.onAccent else t.text)
-        background = round(if (selected) t.accent else t.surface, 20, t.border)
+        setChipSelected(this, t, selected)
         setOnClickListener { onClick() }
     }
+
+fun Context.setChipSelected(v: TextView, t: Theme, selected: Boolean) {
+    v.setTextColor(if (selected) t.onAccent else t.text)
+    v.background = round(if (selected) t.accent else t.surface, 20, t.border)
+}
 
 fun Context.card(t: Theme, onClick: (() -> Unit)? = null, block: LinearLayout.() -> Unit) =
     vbox(16) {
