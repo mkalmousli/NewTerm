@@ -1,0 +1,35 @@
+name: build
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/emuroot
+          key: emuroot-musl-${{ hashFiles('app/fetch-emuroot.gradle.kts') }}
+      - run: ./gradlew assembleDebug --no-daemon
+      - run: cp app/build/outputs/apk/debug/app-debug.apk NewTerm-${{ github.ref_name }}.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NewTerm-apk
+          path: NewTerm-*.apk
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: NewTerm-*.apk
+          generate_release_notes: true

@@ -15,4 +15,5 @@ Package `com.newterm` (app/src/main/kotlin):
   `NewSessionDialog`, `StorageDialog`, `TabBar`, `TerminalView`, `InputBar`.
 - `util/` `Ansi` (SGR→spans), `Symlink` (API 14 safe).
 Binaries: `app/fetch-emuroot.gradle.kts` builds static musl emuroot into `assets/emuroot/<abi>/`.
+CI: `.github/workflows/build.yml` builds the APK on push/PR; tag `v*` publishes a GitHub release.
 Limits: pipe-based terminal (no PTY), so no full-screen TUIs.
